@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -76,9 +77,9 @@ public class SimpleCamelRouteTest {
 
         File outFile = new File("data/output/" + fileName);
         assertTrue(outFile.exists());
-        //String outputMessage = "Data Updated SuccessFully";
-        //String output = new String(Files.readAllBytes(Paths.get("data/output/Success.txt")));
-        //assertEquals(outputMessage,output);
+        String outputMessage = "Data Updated SuccessFully";
+        String output = new String(Files.readAllBytes(Paths.get("data/output/Success.txt")));
+        assertEquals(outputMessage,output);
     }
 
 
@@ -98,9 +99,8 @@ public class SimpleCamelRouteTest {
 
         File outFile = new File("data/output/" + fileName);
         assertTrue(outFile.exists());
-        //String outputMessage = "Data Updated SuccessFully";
-        //String output = new String(Files.readAllBytes(Paths.get("data/output/Success.txt")));
-        //assertEquals(outputMessage,output);
+        File errorDirectory = new File("data/input/error");
+        assertTrue(errorDirectory.exists());
     }
 
 

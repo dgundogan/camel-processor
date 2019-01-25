@@ -13,10 +13,10 @@ spring:
     password: postgres
 
 startRoute: timer:hello?period=10s
-fromRoute: file:data/input?delete=true&readLock=none
+fromRoute: file:data/input?delete=true&readLock=none&moveFailed=error
 toRoute1: file:data/output
 toRoute2: jdbc:dataSource
-toRoute3: file:data/output
+toRoute3: file:data/output?fileName=Success.txt
 
 message: DEV environment
 
