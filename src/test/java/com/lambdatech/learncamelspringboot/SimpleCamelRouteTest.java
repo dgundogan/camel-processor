@@ -16,7 +16,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -57,7 +61,7 @@ public class SimpleCamelRouteTest {
     }
 
     @Test
-    public void testMoveFile_ADD() throws InterruptedException {
+    public void testMoveFile_ADD() throws InterruptedException, IOException {
 
         String message = "type,sku#,itemdescription,price\n" +
                 "ADD,100,Samsung TV,500\n" +
@@ -72,7 +76,33 @@ public class SimpleCamelRouteTest {
 
         File outFile = new File("data/output/" + fileName);
         assertTrue(outFile.exists());
+        //String outputMessage = "Data Updated SuccessFully";
+        //String output = new String(Files.readAllBytes(Paths.get("data/output/Success.txt")));
+        //assertEquals(outputMessage,output);
     }
+
+
+    @Test
+    public void testMoveFile_EXCEPTION() throws InterruptedException, IOException {
+
+        String message = "type,sku#,itemdescription,price\n" +
+                "ADD,,Samsung TV,500\n" +
+                "ADD,101,Samsung TV,300";
+
+        String fileName = "fileTest.txt";
+
+        producerTemplate.sendBodyAndHeader(env.getProperty("fromRoute"),
+                message, Exchange.FILE_NAME, fileName);
+
+        Thread.sleep(3000);
+
+        File outFile = new File("data/output/" + fileName);
+        assertTrue(outFile.exists());
+        //String outputMessage = "Data Updated SuccessFully";
+        //String output = new String(Files.readAllBytes(Paths.get("data/output/Success.txt")));
+        //assertEquals(outputMessage,output);
+    }
+
 
     @Test
     public void testMoveFile_UPDATE() throws InterruptedException {

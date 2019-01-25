@@ -2,7 +2,9 @@ package com.lambdatech.learncamelspringboot.route;
 
 import com.lambdatech.learncamelspringboot.domain.Item;
 import com.lambdatech.learncamelspringboot.process.BuildSQLProcessor;
+import com.lambdatech.learncamelspringboot.process.SuccessProcessor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat;
 import org.apache.camel.spi.DataFormat;
@@ -27,12 +29,22 @@ public class SimpleCamelRoute extends RouteBuilder {
     @Autowired
     BuildSQLProcessor buildSQLProcessor;
 
+    @Autowired
+    SuccessProcessor successProcessor;
+
     @Override
     public void configure() {
 
         log.info("Starting the Camel Route");
 
         DataFormat bindy = new BindyCsvDataFormat(Item.class);
+
+        errorHandler(
+                deadLetterChannel("log:errorInRoute?level=ERROR&showProperties=true")
+                        .maximumRedeliveries(3)
+                        .redeliveryDelay(300)
+                        .backOffMultiplier(2)
+                        .retryAttemptedLogLevel(LoggingLevel.ERROR));
 
         from("{{startRoute}}")
                 .log("Times Invoked and the body" + env.getProperty("message"))
@@ -49,7 +61,9 @@ public class SimpleCamelRoute extends RouteBuilder {
                     .log("Record is ${body}")
                     .process(buildSQLProcessor)
                     .to("jdbc:dataSource")
-                .end();
+                .end()
+            .process(successProcessor)
+            .to("{{toRoute3}}");
 
         log.info("Ending the Camel Route");
     }
