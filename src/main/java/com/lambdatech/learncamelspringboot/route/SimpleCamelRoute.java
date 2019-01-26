@@ -1,5 +1,6 @@
 package com.lambdatech.learncamelspringboot.route;
 
+import com.lambdatech.learncamelspringboot.alert.MailProcessor;
 import com.lambdatech.learncamelspringboot.domain.Item;
 import com.lambdatech.learncamelspringboot.exception.DataException;
 import com.lambdatech.learncamelspringboot.process.BuildSQLProcessor;
@@ -34,6 +35,9 @@ public class SimpleCamelRoute extends RouteBuilder {
     @Autowired
     SuccessProcessor successProcessor;
 
+    @Autowired
+    MailProcessor mailProcessor;
+
     @Override
     public void configure() {
 
@@ -41,17 +45,19 @@ public class SimpleCamelRoute extends RouteBuilder {
 
         DataFormat bindy = new BindyCsvDataFormat(Item.class);
 
-        /*errorHandler(
+        errorHandler(
                 deadLetterChannel("log:errorInRoute?level=ERROR&showProperties=true")
                         .maximumRedeliveries(3)
                         .redeliveryDelay(300)
                         .backOffMultiplier(2)
-                        .retryAttemptedLogLevel(LoggingLevel.ERROR));*/
+                        .retryAttemptedLogLevel(LoggingLevel.ERROR));
 
         //if DB is down, it raises PSQLException
         onException(PSQLException.class).log(LoggingLevel.ERROR, "PSQLException in the route ${body}");
 
-        onException(DataException.class).log(LoggingLevel.ERROR, "Exception in the route ${body}");
+        onException(DataException.class)
+                .log(LoggingLevel.ERROR, "Exception in the route ${body}")
+                .process(mailProcessor);
 
         from("{{startRoute}}")
                 .log("Times Invoked and the body" + env.getProperty("message"))

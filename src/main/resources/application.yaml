@@ -11,6 +11,16 @@ spring:
     jdbc-url: jdbc:postgresql://localhost:5432/localDB
     username: postgres
     password: postgres
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dgundogan@gmail.com
+    password:
+    properties.mail.smtp.auth: true
+    properties.mail.smtp.startls.enable: true
+
+  mailto: dgundogan@gmail.com
+  mailFrom: dgundogan@gmail.com
 
 startRoute: timer:hello?period=10s
 fromRoute: file:data/input?delete=true&readLock=none&moveFailed=error
