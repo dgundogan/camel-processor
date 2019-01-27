@@ -1,6 +1,14 @@
 spring:
   profiles:
     active: dev
+camel:
+  springboot:
+    shutdownTimeout: 2
+    health.indicator.enabled: true
+
+management:
+  security:
+    enabled: false
 
 ---
 
@@ -27,6 +35,7 @@ fromRoute: file:data/input?delete=true&readLock=none&moveFailed=error
 toRoute1: file:data/output
 toRoute2: jdbc:dataSource
 toRoute3: file:data/output?fileName=Success.txt
+healthRoute: timer:healthRoute?period=10s
 
 message: DEV environment
 
@@ -38,6 +47,9 @@ spring:
 startRoute: direct:input
 fromRoute: file:data/input?delete=true&readLock=none
 toRoute1: mock:output
+toRoute2: mock:output1
+toRoute3: mock:output2
+healthRoute: direct:health
 
 message: MOCK environment
 
